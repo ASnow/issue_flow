@@ -74,7 +74,7 @@ module Daemons
 
       Rails.logger = Logger.new(File.join(Rails.root, 'log', "#{PROCESS_NAME}.log"))
 
-      Warden::Clients::Publisher.new options[:address] do |conn|
+      Warden::Clients::Publisher.new options[:address], options[:port] do |conn|
         redis = EM::Hiredis.connect
         pubsub = redis.pubsub
 
