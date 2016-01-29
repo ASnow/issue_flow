@@ -9,8 +9,8 @@ require 'optparse'
 # Control class for Directory-server.
 # Parse arguments, configure and start server
 module Daemons
-  class Warden
-    PROCESS_NAME = 'warden_manager'
+  class WardenPublisher
+    PROCESS_NAME = 'warden_publisher'
     # 
     # Constructor. Parse arguments passed from console
     # @param args [Array] console arguments ARGV
@@ -73,7 +73,15 @@ module Daemons
       Dir.chdir(Rails.root)
 
       Rails.logger = Logger.new(File.join(Rails.root, 'log', "#{PROCESS_NAME}.log"))
-      ::Warden::Server.start options
+
+      Warden::Clients::Publisher.new options[:address] do |conn|
+        redis = EM::Hiredis.connect
+        pubsub = redis.pubsub
+
+        pubsub.psubscribe('user.*') do |channel, msg|
+          conn.send_msg JSON.dump [channel, msg]
+        end
+      end
     rescue => e
       Rails.logger.fatal e
       STDERR.puts e.message

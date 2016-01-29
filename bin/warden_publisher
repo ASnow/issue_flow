@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'environment'))
-require_relative '../lib/daemons/warden_manager'
+require_relative '../lib/daemons/warden_publisher'
 
-Daemons::WardenManager.new(ARGV).daemonize
+Daemons::WardenPublisher.new(ARGV).daemonize
